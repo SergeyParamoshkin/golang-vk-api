@@ -12,8 +12,8 @@ import (
 )
 
 const (
-	tokenURL = "https://oauth.vk.com/token"
-	apiURL   = "https://api.vk.com/method/%s"
+	tokenURL   = "https://oauth.vk.com/token"
+	apiURL     = "https://api.vk.com/method/%s"
 	apiVersion = "5.103"
 )
 
@@ -102,16 +102,15 @@ func NewVKGroupBot(token string, options *TokenOptions) (*VKGroupBot, error) {
 	if err != nil {
 		return nil, err
 	}
-	
+
 	var res []*Group
 	json.Unmarshal(resp.Response, &res)
 	return &VKGroupBot{
 		VKClient: *vkclient,
-		Group: *res[0],
+		Group:    *res[0],
 		cb: &botsCallBackHandler{
 			events: make(map[string]func(*BotsLongPollObject)),
 		},
-
 	}, nil
 }
 

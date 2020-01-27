@@ -17,16 +17,16 @@ const (
 
 var client *VKClient
 
-func TestMain(m *testing.M) {
-	var err error
-	client, err = NewVKClient(DeviceIPhone, testUser, testPassword)
-	if err != nil {
-		fmt.Println(err)
-		return
-	}
-
-	m.Run()
-}
+//func TestMain(m *testing.M) {
+//	var err error
+//	client, err = NewVKClient(DeviceIPhone, testUser, testPassword)
+//	if err != nil {
+//		fmt.Println(err)
+//		return
+//	}
+//
+//	m.Run()
+//}
 
 func TestVKClient_BoardAddTopic(t *testing.T) {
 	id, err := client.BoardAddTopic(testCommunity, "This is the title", "This is the text", false, []string{})
