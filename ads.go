@@ -4,10 +4,11 @@ import (
 	"encoding/json"
 	"fmt"
 	"net/url"
+	"strconv"
 )
 
 type TargetGroupResponse struct {
-	ID int64 `json:"id"`
+	ID int `json:"id"`
 }
 
 func (client *VKClient) CreateTargetGroup(AccountID string, lifetime string, name string) (TargetGroupResponse, error) {
@@ -39,29 +40,36 @@ func (client *VKClient) CreateTargetGroup(AccountID string, lifetime string, nam
 //	return nil
 //}
 
-/// Возвращает количество обработанных контактов.
+// Возвращает количество обработанных контактов.
 type ImportTargetContactsResponse struct {
-	ID int64 `json:"response"`
+	Response int `json:"response"`
 }
 
+// Examples:
+// ImportTargetContacts
+//
 func (client *VKClient) ImportTargetContacts(
 	accountID string,
-	targetGroupID string,
+	targetGroupID int,
 	contacts string) (ImportTargetContactsResponse, error) {
 	d := ImportTargetContactsResponse{}
 	v := url.Values{}
 	v.Add("account_id", accountID)
-	v.Add("target_group_id", targetGroupID)
+	v.Add("target_group_id", strconv.Itoa(targetGroupID))
 	v.Add("contacts", contacts)
 	resp, err := client.MakeRequest("ads.importTargetContacts", v)
 	if err != nil {
 		return d, err
 	}
 
-	err = json.Unmarshal(resp.Response, &d)
+	err = json.Unmarshal(resp.Response, &d.Response)
 	if err != nil {
 		return d, err
 	}
 
 	return d, nil
+}
+
+func parseContacts() string {
+	return ""
 }
