@@ -48,3 +48,49 @@ client.AddLongpollCallback("msgonline", func(m *vkapi.LongPollMessage) {
 // starting 
 client.ListenLongPollServer()
 ```
+
+### [ads](https://vk.com/dev/ads) 
+- [ ] addOfficeUsers
+- [ ] checkLink
+- [ ] createAds
+- [ ] createCampaigns
+- [ ] createClients
+- [ ] createLookalikeRequest
+- [X] createTargetGroup
+- [ ] createTargetPixel
+- [ ] deleteAds
+- [ ] deleteCampaigns
+- [ ] deleteClients
+- [ ] deleteTargetGroup
+- [ ] deleteTargetPixel
+- [ ] getAccounts
+- [ ] getAds
+- [ ] getAdsLayout
+- [ ] getAdsTargeting
+- [ ] getBudget
+- [ ] getCampaigns
+- [ ] getCategories
+- [ ] getClients
+- [ ] getDemographics
+- [ ] getFloodStats
+- [ ] getLookalikeRequests
+- [ ] getOfficeUsers
+- [ ] getPostsReach
+- [ ] getRejectionReason
+- [ ] getStatistics
+- [ ] getSuggestions
+- [ ] getTargetGroups
+- [ ] getTargetPixels
+- [ ] getTargetingStats
+- [ ] getUploadURL
+- [ ] getVideoUploadURL
+- [X] importTargetContacts
+- [ ] removeOfficeUsers
+- [ ] removeTargetContacts
+- [ ] saveLookalikeRequestResult
+- [ ] shareTargetGroup
+- [ ] updateAds
+- [ ] updateCampaigns
+- [ ] updateClients
+- [ ] updateTargetGroup
+- [ ] updateTargetPixel
