@@ -1,3 +1,3 @@
-module github.com/himidori/golang-vk-api
+module github.com/SergeyParamoshkin/golang-vk-api
 
-go 1.12
+go 1.13
