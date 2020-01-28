@@ -49,7 +49,7 @@ client.AddLongpollCallback("msgonline", func(m *vkapi.LongPollMessage) {
 client.ListenLongPollServer()
 ```
 
-### [ads](https://vk.com/dev/ads) 
+### [ads](https://vk.com/dev/ads) sponsored by [elenoise.ru](https://elenoise.ru)
 - [ ] addOfficeUsers
 - [ ] checkLink
 - [ ] createAds
@@ -61,7 +61,7 @@ client.ListenLongPollServer()
 - [ ] deleteAds
 - [ ] deleteCampaigns
 - [ ] deleteClients
-- [ ] deleteTargetGroup
+- [X] deleteTargetGroup
 - [ ] deleteTargetPixel
 - [ ] getAccounts
 - [ ] getAds
@@ -79,7 +79,7 @@ client.ListenLongPollServer()
 - [ ] getRejectionReason
 - [ ] getStatistics
 - [ ] getSuggestions
-- [ ] getTargetGroups
+- [X] getTargetGroups
 - [ ] getTargetPixels
 - [ ] getTargetingStats
 - [ ] getUploadURL
