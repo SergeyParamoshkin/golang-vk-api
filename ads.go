@@ -7,6 +7,16 @@ import (
 	"strconv"
 )
 
+type Ads struct {
+	client *VKClient
+}
+
+func NewAds(client *VKClient) *Ads {
+	return &Ads{
+		client: client,
+	}
+}
+
 type CreateTargetGroupResponse struct {
 	ID int `json:"id"`
 }
@@ -25,8 +35,7 @@ type CreateTargetGroupResponse struct {
 // pixel (string) — код для размещения на сайте рекламодателя. Возвращается, если параметр extended = 1 (только для старых групп).
 // domain (string) — домен сайта, где размещен код учета пользователей (только для старых групп).
 type TargetGroupResponse struct {
-	ID int `json:"id"`
-
+	ID              int    `json:"id"`
 	Name            string `json:"name"`
 	LastUpdated     int    `json:"last_updated"`
 	IsAudience      bool   `json:"is_audience"`
@@ -41,14 +50,14 @@ type TargetGroupResponse struct {
 }
 
 //
-func (client *VKClient) CreateTargetGroup(AccountID string, lifetime string, name string) (CreateTargetGroupResponse, error) {
+func (a *Ads) CreateTargetGroup(AccountID string, lifetime string, name string) (CreateTargetGroupResponse, error) {
 	d := CreateTargetGroupResponse{}
 	v := url.Values{}
 	v.Add("account_id", AccountID)
 	v.Add("lifetime", lifetime)
 	v.Add("name", name)
 
-	resp, err := client.MakeRequest("ads.createTargetGroup", v)
+	resp, err := a.client.MakeRequest("ads.createTargetGroup", v)
 	if err != nil {
 		return d, err
 	}
@@ -62,12 +71,12 @@ func (client *VKClient) CreateTargetGroup(AccountID string, lifetime string, nam
 	return d, nil
 }
 
-func (client *VKClient) GetTargetGroup(AccountID string) ([]TargetGroupResponse, error) {
+func (a *Ads) GetTargetGroup(AccountID string) ([]TargetGroupResponse, error) {
 	d := []TargetGroupResponse{}
 	v := url.Values{}
 	v.Add("account_id", AccountID)
 
-	resp, err := client.MakeRequest("ads.getTargetGroups", v)
+	resp, err := a.client.MakeRequest("ads.getTargetGroups", v)
 	if err != nil {
 		return d, err
 	}
@@ -81,18 +90,18 @@ func (client *VKClient) GetTargetGroup(AccountID string) ([]TargetGroupResponse,
 	return d, nil
 }
 
-func (client *VKClient) UpdateTargetGroup(AccountID string, TargetGroupID int) (int, error) {
+func (a *Ads) UpdateTargetGroup(AccountID string, TargetGroupID int) (int, error) {
 	d := 0
 	return d, nil
 }
 
 //
-func (client *VKClient) DeleteTargetGroup(AccountID string, TargetGroupID int) (int, error) {
+func (a *Ads) DeleteTargetGroup(AccountID string, TargetGroupID int) (int, error) {
 	d := 0
 	v := url.Values{}
 	v.Add("account_id", AccountID)
 	v.Add("target_group_id", strconv.Itoa(TargetGroupID))
-	resp, err := client.MakeRequest("ads.deleteTargetGroup", v)
+	resp, err := a.client.MakeRequest("ads.deleteTargetGroup", v)
 
 	if err != nil {
 		return d, err
@@ -114,7 +123,7 @@ type ImportTargetContactsResponse struct {
 // Examples:
 // ImportTargetContacts
 //
-func (client *VKClient) ImportTargetContacts(
+func (a *Ads) ImportTargetContacts(
 	accountID string,
 	targetGroupID int,
 	contacts string) (ImportTargetContactsResponse, error) {
@@ -123,7 +132,7 @@ func (client *VKClient) ImportTargetContacts(
 	v.Add("account_id", accountID)
 	v.Add("target_group_id", strconv.Itoa(targetGroupID))
 	v.Add("contacts", contacts)
-	resp, err := client.MakeRequest("ads.importTargetContacts", v)
+	resp, err := a.client.MakeRequest("ads.importTargetContacts", v)
 	if err != nil {
 		return d, err
 	}
