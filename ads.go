@@ -49,6 +49,13 @@ type TargetGroupResponse struct {
 	Domain          string `json:"domain"`
 }
 
+type GetClientResponse []struct {
+	ID       int    `json:"id"`
+	Name     string `json:"name"`
+	DayLimit string `json:"day_limit"`
+	AllLimit string `json:"all_limit"`
+}
+
 //
 func (a *Ads) CreateTargetGroup(AccountID string, lifetime string, name string) (CreateTargetGroupResponse, error) {
 	d := CreateTargetGroupResponse{}
@@ -138,6 +145,27 @@ func (a *Ads) ImportTargetContacts(
 	}
 
 	err = json.Unmarshal(resp.Response, &d.Response)
+	if err != nil {
+		return d, err
+	}
+
+	return d, nil
+}
+
+// Examples:
+// GetClients
+//
+
+func (a *Ads) GetClients(accountID string) (GetClientResponse, error) {
+	d := GetClientResponse{}
+	v := url.Values{}
+	v.Add("account_id", accountID)
+	resp, err := a.client.MakeRequest("ads.getClients", v)
+	if err != nil {
+		return d, err
+	}
+
+	err = json.Unmarshal(resp.Response, &d)
 	if err != nil {
 		return d, err
 	}
