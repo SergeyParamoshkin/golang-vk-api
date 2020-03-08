@@ -78,20 +78,44 @@ func (a *Ads) CreateTargetGroup(AccountID string, lifetime string, name string) 
 	return d, nil
 }
 
-func (a *Ads) GetTargetGroup(AccountID string) ([]TargetGroupResponse, error) {
+func (a *Ads) GetTargetGroup(AccountID string, ClientIDs ...int) ([]TargetGroupResponse, error) {
 	d := []TargetGroupResponse{}
 	v := url.Values{}
 	v.Add("account_id", AccountID)
 
-	resp, err := a.client.MakeRequest("ads.getTargetGroups", v)
-	if err != nil {
-		return d, err
+	get := func() error {
+		resp, err := a.client.MakeRequest("ads.getTargetGroups", v)
+		if err != nil {
+			return err
+		}
+
+		ret := []TargetGroupResponse{}
+
+		err = json.Unmarshal(resp.Response, &ret)
+		if err != nil {
+			log.Println(err, string(resp.Response))
+			return err
+		}
+
+		d = append(d, ret...)
+
+		return nil
 	}
 
-	err = json.Unmarshal(resp.Response, &d)
-	if err != nil {
-		log.Println(err, string(resp.Response))
-		return d, err
+	if len(ClientIDs) == 0 {
+		if err := get(); err != nil {
+			return d, err
+		}
+
+		return d, nil
+	}
+
+	for _, ClientID := range ClientIDs {
+		v.Set("client_id", strconv.Itoa(ClientID))
+
+		if err := get(); err != nil {
+			return d, err
+		}
 	}
 
 	return d, nil
