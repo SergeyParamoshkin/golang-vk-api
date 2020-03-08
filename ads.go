@@ -78,7 +78,7 @@ func (a *Ads) CreateTargetGroup(AccountID string, lifetime string, name string) 
 	return d, nil
 }
 
-func (a *Ads) GetTargetGroup(AccountID string, ClientIDs ...string) ([]TargetGroupResponse, error) {
+func (a *Ads) GetTargetGroup(AccountID string, ClientIDs ...int) ([]TargetGroupResponse, error) {
 	d := []TargetGroupResponse{}
 	v := url.Values{}
 	v.Add("account_id", AccountID)
@@ -111,7 +111,7 @@ func (a *Ads) GetTargetGroup(AccountID string, ClientIDs ...string) ([]TargetGro
 	}
 
 	for _, ClientID := range ClientIDs {
-		v.Set("client_id", ClientID)
+		v.Set("client_id", strconv.Itoa(ClientID))
 
 		if err := get(); err != nil {
 			return d, err
