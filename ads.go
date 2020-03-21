@@ -56,32 +56,67 @@ type GetClientResponse []struct {
 	AllLimit string `json:"all_limit"`
 }
 
-//
-func (a *Ads) CreateTargetGroup(AccountID string, lifetime string, name string) (CreateTargetGroupResponse, error) {
-	d := CreateTargetGroupResponse{}
-	v := url.Values{}
-	v.Add("account_id", AccountID)
-	v.Add("lifetime", lifetime)
-	v.Add("name", name)
-
-	resp, err := a.client.MakeRequest("ads.createTargetGroup", v)
-	if err != nil {
-		return d, err
-	}
-
-	err = json.Unmarshal(resp.Response, &d)
-	if err != nil {
-		log.Println(err, string(resp.Response))
-		return d, err
-	}
-
-	return d, nil
+type GetAccountResponse struct {
+	ID     int    `json:"account_id"`
+	Type   string `json:"account_type"`
+	Status int    `json:"account_status"`
+	Role   string `json:"access_role"`
 }
 
-func (a *Ads) GetTargetGroup(AccountID string, ClientIDs ...int) ([]TargetGroupResponse, error) {
+//
+func (a *Ads) CreateTargetGroup(AccountID int, Lifetime string, Name string, ClientIDs ...int) ([]CreateTargetGroupResponse, error) {
+
+	v := url.Values{}
+	v.Add("account_id", strconv.Itoa(AccountID))
+	v.Add("lifetime", Lifetime)
+	v.Add("name", Name)
+
+	create := func() (CreateTargetGroupResponse, error) {
+		d := CreateTargetGroupResponse{}
+
+		resp, err := a.client.MakeRequest("ads.createTargetGroup", v)
+		if err != nil {
+			return d, err
+		}
+
+		err = json.Unmarshal(resp.Response, &d)
+		if err != nil {
+			log.Println(err, string(resp.Response))
+			return d, err
+		}
+
+		return d, nil
+	}
+
+	if len(ClientIDs) == 0 {
+		d, err := create()
+		if err != nil {
+			return nil, err
+		}
+
+		return []CreateTargetGroupResponse{d}, nil
+	}
+
+	ds := make([]CreateTargetGroupResponse, len(ClientIDs))
+
+	for i, clientID := range ClientIDs {
+		v.Set("client_id", strconv.Itoa(clientID))
+
+		d, err := create()
+		if err != nil {
+			return nil, err
+		}
+
+		ds[i] = d
+	}
+
+	return ds, nil
+}
+
+func (a *Ads) GetTargetGroup(AccountID int, ClientIDs ...int) ([]TargetGroupResponse, error) {
 	d := []TargetGroupResponse{}
 	v := url.Values{}
-	v.Add("account_id", AccountID)
+	v.Add("account_id", strconv.Itoa(AccountID))
 
 	get := func() error {
 		resp, err := a.client.MakeRequest("ads.getTargetGroups", v)
@@ -127,23 +162,50 @@ func (a *Ads) UpdateTargetGroup(AccountID string, TargetGroupID int) (int, error
 }
 
 //
-func (a *Ads) DeleteTargetGroup(AccountID string, TargetGroupID int) (int, error) {
-	d := 0
+func (a *Ads) DeleteTargetGroup(AccountID int, TargetGroupID int, ClientIDs ...int) ([]int, error) {
 	v := url.Values{}
-	v.Add("account_id", AccountID)
+	v.Add("account_id", strconv.Itoa(AccountID))
 	v.Add("target_group_id", strconv.Itoa(TargetGroupID))
-	resp, err := a.client.MakeRequest("ads.deleteTargetGroup", v)
 
-	if err != nil {
-		return d, err
+	delete := func() (int, error) {
+		resp, err := a.client.MakeRequest("ads.deleteTargetGroup", v)
+		if err != nil {
+			return 0, err
+		}
+
+		var d int
+
+		err = json.Unmarshal(resp.Response, &d)
+		if err != nil {
+			return 0, err
+		}
+
+		return d, nil
 	}
 
-	err = json.Unmarshal(resp.Response, &d)
-	if err != nil {
-		return d, err
+	if len(ClientIDs) == 0 {
+		d, err := delete()
+		if err != nil {
+			return nil, err
+		}
+
+		return []int{d}, nil
 	}
 
-	return d, nil
+	ds := make([]int, len(ClientIDs))
+
+	for i, clientID := range ClientIDs {
+		v.Set("client_id", strconv.Itoa(clientID))
+
+		d, err := delete()
+		if err != nil {
+			return nil, err
+		}
+
+		ds[i] = d
+	}
+
+	return ds, nil
 }
 
 // Возвращает количество обработанных контактов.
@@ -155,12 +217,12 @@ type ImportTargetContactsResponse struct {
 // ImportTargetContacts
 //
 func (a *Ads) ImportTargetContacts(
-	accountID string,
+	accountID int,
 	targetGroupID int,
 	contacts string) (ImportTargetContactsResponse, error) {
 	d := ImportTargetContactsResponse{}
 	v := url.Values{}
-	v.Add("account_id", accountID)
+	v.Add("account_id", strconv.Itoa(accountID))
 	v.Add("target_group_id", strconv.Itoa(targetGroupID))
 	v.Add("contacts", contacts)
 	resp, err := a.client.MakeRequest("ads.importTargetContacts", v)
@@ -180,10 +242,12 @@ func (a *Ads) ImportTargetContacts(
 // GetClients
 //
 
-func (a *Ads) GetClients(accountID string) (GetClientResponse, error) {
+func (a *Ads) GetClients(AccountID int) (GetClientResponse, error) {
 	d := GetClientResponse{}
+
 	v := url.Values{}
-	v.Add("account_id", accountID)
+	v.Add("account_id", strconv.Itoa(AccountID))
+
 	resp, err := a.client.MakeRequest("ads.getClients", v)
 	if err != nil {
 		return d, err
@@ -195,4 +259,20 @@ func (a *Ads) GetClients(accountID string) (GetClientResponse, error) {
 	}
 
 	return d, nil
+}
+
+func (a *Ads) GetAccounts() ([]GetAccountResponse, error) {
+	resp, err := a.client.MakeRequest("ads.getAccounts", nil)
+	if err != nil {
+		return nil, err
+	}
+
+	ret := make([]GetAccountResponse, 0)
+
+	err = json.Unmarshal(resp.Response, &ret)
+	if err != nil {
+		return nil, err
+	}
+
+	return ret, nil
 }
